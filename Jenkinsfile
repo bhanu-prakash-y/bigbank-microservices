@@ -70,24 +70,24 @@ pipeline {
             }
         }
 
-        stage('Deploy to DEV') {
+        stage('Deploy to UAT') {
             steps {
                 sh '''
-                    echo "Deploying Discovery Service image ${IMAGE_TAG} to DEV..."
+                    echo "Deploying Discovery Service image ${IMAGE_TAG} to UAT..."
 
                     aws eks update-kubeconfig \
                     --region ${AWS_REGION} \
                     --name microservices-cluster
 
                     sed "s/IMAGE_TAG/${IMAGE_TAG}/g" \
-                    kubernetes/dev/deployment.yaml > deployment-rendered.yaml
+                    kubernetes/uat/deployment.yaml > deployment-rendered.yaml
 
                     kubectl apply -f deployment-rendered.yaml
-                    kubectl apply -f kubernetes/dev/service.yaml
+                    kubectl apply -f kubernetes/uat/service.yaml
 
                     kubectl rollout status \
                     deployment/discovery-service \
-                    -n dev \
+                    -n uat \
                     --timeout=180s
                 '''
             }
@@ -96,7 +96,7 @@ pipeline {
 
     post {
         success {
-            echo "Discovery image ${IMAGE_TAG} deployed successfully to DEV."
+            echo "Discovery image ${IMAGE_TAG} deployed successfully to UAT."
         }
 
         failure {
