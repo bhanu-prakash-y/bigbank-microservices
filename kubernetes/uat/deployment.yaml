@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: discovery-service
-  namespace: dev
+  namespace: uat
   labels:
     app: discovery-service
 spec:
