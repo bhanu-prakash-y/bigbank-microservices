@@ -7,6 +7,7 @@ pipeline {
         ECR_REPOSITORY = 'bigbank/discovery-service'
         ECR_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
         IMAGE_TAG = "${BUILD_NUMBER}"
+        PATH = "/var/lib/jenkins/.local/bin:/usr/local/bin:/usr/bin:/bin"
     }
 
     stages {
@@ -32,7 +33,7 @@ pipeline {
         stage('ECR Login') {
             steps {
                 sh '''
-                    /var/lib/jenkins/.local/bin/aws ecr get-login-password \
+                    aws ecr get-login-password \
                     --region ${AWS_REGION} | \
                     docker login \
                     --username AWS \
@@ -68,37 +69,38 @@ pipeline {
                 '''
             }
         }
+
         stage('Deploy to DEV') {
             steps {
                 sh '''
-            echo "Deploying Discovery Service image ${IMAGE_TAG} to DEV..."
+                    echo "Deploying Discovery Service image ${IMAGE_TAG} to DEV..."
 
-            /var/lib/jenkins/.local/bin/aws eks update-kubeconfig \
-                --region ${AWS_REGION} \
-                --name microservices-cluster
+                    aws eks update-kubeconfig \
+                    --region ${AWS_REGION} \
+                    --name microservices-cluster
 
-            sed "s/IMAGE_TAG/${IMAGE_TAG}/g" \
-                kubernetes/dev/deployment.yaml > deployment-rendered.yaml
+                    sed "s/IMAGE_TAG/${IMAGE_TAG}/g" \
+                    kubernetes/dev/deployment.yaml > deployment-rendered.yaml
 
-            kubectl apply -f deployment-rendered.yaml
-            kubectl apply -f kubernetes/dev/service.yaml
+                    kubectl apply -f deployment-rendered.yaml
+                    kubectl apply -f kubernetes/dev/service.yaml
 
-            kubectl rollout status \
-                deployment/discovery-service \
-                -n dev \
-                --timeout=180s
-        '''
+                    kubectl rollout status \
+                    deployment/discovery-service \
+                    -n dev \
+                    --timeout=180s
+                '''
             }
         }
     }
 
     post {
         success {
-            echo "Discovery image ${IMAGE_TAG} pushed successfully to ECR."
+            echo "Discovery image ${IMAGE_TAG} deployed successfully to DEV."
         }
 
         failure {
-            echo 'Discovery CI pipeline failed.'
+            echo 'Discovery CI/CD pipeline failed.'
         }
     }
 }
