@@ -32,7 +32,7 @@ pipeline {
         stage('ECR Login') {
             steps {
                 sh '''
-                    /usr/local/bin/aws ecr get-login-password \
+                    /var/lib/jenkins/.local/bin/aws ecr get-login-password \
                     --region ${AWS_REGION} | \
                     docker login \
                     --username AWS \
@@ -73,7 +73,7 @@ pipeline {
                 sh '''
             echo "Deploying Discovery Service image ${IMAGE_TAG} to DEV..."
 
-            /usr/local/bin/aws eks update-kubeconfig \
+            /var/lib/jenkins/.local/bin/aws eks update-kubeconfig \
                 --region ${AWS_REGION} \
                 --name microservices-cluster
 
