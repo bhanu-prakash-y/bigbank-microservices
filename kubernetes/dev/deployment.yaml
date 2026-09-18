@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: discovery-service
+  namespace: dev
+  labels:
+    app: discovery-service
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: discovery-service
+
+  template:
+    metadata:
+      labels:
+        app: discovery-service
+
+    spec:
+      containers:
+        - name: discovery-service
+          image: 255248181810.dkr.ecr.us-east-1.amazonaws.com/bigbank/discovery-service:7
+          imagePullPolicy: IfNotPresent
+
+          ports:
+            - containerPort: 8761
+              protocol: TCP
