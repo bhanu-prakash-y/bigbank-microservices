@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: discovery-service
-          image: 255248181810.dkr.ecr.us-east-1.amazonaws.com/bigbank/discovery-service:7
+          image: 255248181810.dkr.ecr.us-east-1.amazonaws.com/bigbank/discovery-service:IMAGE_TAG
           imagePullPolicy: IfNotPresent
 
           ports:

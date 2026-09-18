@@ -10,7 +10,6 @@ pipeline {
     }
 
     stages {
-
         stage('Checkout') {
             steps {
                 checkout scm
@@ -67,6 +66,28 @@ pipeline {
                     docker push \
                     ${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}
                 '''
+            }
+        }
+        stage('Deploy to DEV') {
+            steps {
+                sh '''
+            echo "Deploying Discovery Service image ${IMAGE_TAG} to DEV..."
+
+            /usr/local/bin/aws eks update-kubeconfig \
+                --region ${AWS_REGION} \
+                --name microservices-cluster
+
+            sed "s/IMAGE_TAG/${IMAGE_TAG}/g" \
+                kubernetes/dev/deployment.yaml > deployment-rendered.yaml
+
+            kubectl apply -f deployment-rendered.yaml
+            kubectl apply -f kubernetes/dev/service.yaml
+
+            kubectl rollout status \
+                deployment/discovery-service \
+                -n dev \
+                --timeout=180s
+        '''
             }
         }
     }
