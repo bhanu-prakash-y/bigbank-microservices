@@ -23,4 +23,6 @@ spec:
             - containerPort: 8761
           envFrom:
             - configMapRef:
-                name: discovery-service-configmap  
+                name: discovery-service-configmap
+            - secretRef:
+               name: discovery-service-secret    
