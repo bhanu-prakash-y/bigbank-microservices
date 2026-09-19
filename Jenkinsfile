@@ -69,24 +69,24 @@ pipeline {
                 '''
             }
         }
-        stage('Deploy to UAT using Helm') {
-            steps {
-                sh '''
-            echo "Deploying Discovery Service image ${IMAGE_TAG} to UAT using Helm..."
+        // stage('Deploy to UAT using Helm') {
+        //     steps {
+        //         sh '''
+        //     echo "Deploying Discovery Service image ${IMAGE_TAG} to UAT using Helm..."
 
-            aws eks update-kubeconfig \
-                --region ${AWS_REGION} \
-                --name microservices-cluster
+        //     aws eks update-kubeconfig \
+        //         --region ${AWS_REGION} \
+        //         --name microservices-cluster
 
-            helm upgrade --install discovery-service \
-                helm/discovery-service \
-                --namespace uat \
-                --set image.tag=${IMAGE_TAG} \
-                --wait \
-                --timeout 5m
-        '''
-            }
-        }
+        //     helm upgrade --install discovery-service \
+        //         helm/discovery-service \
+        //         --namespace uat \
+        //         --set image.tag=${IMAGE_TAG} \
+        //         --wait \
+        //         --timeout 5m
+        // '''
+        //     }
+        // }
 
 //         stage('Deploy to UAT') {
 //             steps {
