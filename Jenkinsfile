@@ -1,13 +1,13 @@
 pipeline {
     agent any
 
-    environment {
+   environment {
         AWS_REGION = 'us-east-1'
         AWS_ACCOUNT_ID = '255248181810'
         ECR_REPOSITORY = 'bigbank/discovery-service'
         ECR_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
         IMAGE_TAG = "${BUILD_NUMBER}"
-        PATH = "/var/lib/jenkins/.local/bin:/usr/local/bin:/usr/bin:/bin"
+        PATH = '/var/lib/jenkins/.local/bin:/usr/local/bin:/usr/bin:/bin'
     }
 
     stages {
@@ -69,29 +69,47 @@ pipeline {
                 '''
             }
         }
-
-        stage('Deploy to UAT') {
+        stage('Deploy to UAT using Helm') {
             steps {
                 sh '''
-                    echo "Deploying Discovery Service image ${IMAGE_TAG} to UAT..."
+            echo "Deploying Discovery Service image ${IMAGE_TAG} to UAT using Helm..."
 
-                    aws eks update-kubeconfig \
-                    --region ${AWS_REGION} \
-                    --name microservices-cluster
+            aws eks update-kubeconfig \
+                --region ${AWS_REGION} \
+                --name microservices-cluster
 
-                    sed "s/IMAGE_TAG/${IMAGE_TAG}/g" \
-                    kubernetes/uat/deployment.yaml > deployment-rendered.yaml
-
-                    kubectl apply -f deployment-rendered.yaml
-                    kubectl apply -f kubernetes/uat/service.yaml
-
-                    kubectl rollout status \
-                    deployment/discovery-service \
-                    -n uat \
-                    --timeout=180s
-                '''
+            helm upgrade --install discovery-service \
+                helm/discovery-service \
+                --namespace uat \
+                --set image.tag=${IMAGE_TAG} \
+                --wait \
+                --timeout 5m
+        '''
             }
         }
+
+//         stage('Deploy to UAT') {
+//             steps {
+//                 sh '''
+//                     echo "Deploying Discovery Service image ${IMAGE_TAG} to UAT..."
+
+//                     aws eks update-kubeconfig \
+//                     --region ${AWS_REGION} \
+//                     --name microservices-cluster
+
+//                     sed "s/IMAGE_TAG/${IMAGE_TAG}/g" \
+//                     kubernetes/uat/deployment.yaml > deployment-rendered.yaml
+
+//                     kubectl apply -f deployment-rendered.yaml
+//                     kubectl apply -f kubernetes/uat/service.yaml
+
+    //                     kubectl rollout status \
+    //                     deployment/discovery-service \
+    //                     -n uat \
+    //                     --timeout=180s
+    //                 '''
+    //             }
+    //         }
     }
 
     post {
