@@ -9,3 +9,11 @@ service:
   type: ClusterIP
   port: 8761
   targetPort: 8761
+  
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi  

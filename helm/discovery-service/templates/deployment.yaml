@@ -25,4 +25,6 @@ spec:
             - configMapRef:
                 name: discovery-service-configmap
             - secretRef:
-               name: discovery-service-secret    
+               name: discovery-service-secret
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
