@@ -1,0 +1,11 @@
+replicaCount: 2
+
+image:
+  repository: 255248181810.dkr.ecr.us-east-1.amazonaws.com/bigbank/discovery-service
+  tag: "14"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8761
+  targetPort: 8761
