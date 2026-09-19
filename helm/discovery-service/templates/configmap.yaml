@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: configmap
+metadata:
+  name: discovery-service-configmap
+data:
+  APP_ENV: "uat"
+  LOG_LEVEL: "INFO"

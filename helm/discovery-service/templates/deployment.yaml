@@ -21,3 +21,6 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: 8761
+          envFrom:
+            - configMapRef:
+                name: discovery-service-configmap  
